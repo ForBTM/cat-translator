@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="猫语翻译">
+<meta name="theme-color" content="#fff8f5">
+<title>猫语翻译器 🐾</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #ff6b9d;
+  --pink-light: #ffb3cd;
+  --pink-bg: #fff0f5;
+  --purple: #c084fc;
+  --purple-light: #e9d5ff;
+  --cream: #fff8f5;
+  --yellow: #fde68a;
+  --green: #6ee7b7;
+  --text: #1f1f2e;
+  --muted: #9ca3af;
+  --white: #ffffff;
+  --shadow: rgba(255,107,157,0.15);
+  --radius: 20px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  height: 100%;
+  background: var(--cream);
+  font-family: 'Nunito', sans-serif;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── App Shell ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  background: var(--cream);
+}
+
+/* ── Top bar ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 20px 8px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 22px;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cat-face {
+  font-size: 22px;
+  margin-right: 8px;
+  display: inline-block;
+  animation: catBlink 4s ease-in-out infinite;
+}
+
+@keyframes catBlink {
+  0%,90%,100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+/* ── Tab bar ── */
+.tabs {
+  display: flex;
+  background: var(--white);
+  border-radius: 16px;
+  margin: 0 16px 10px;
+  padding: 4px;
+  box-shadow: 0 2px 12px var(--shadow);
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 4px;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.tab-btn .tab-icon { font-size: 18px; }
+
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  box-shadow: 0 4px 12px rgba(255,107,157,0.35);
+}
+
+/* ── Pages ── */
+.pages { flex: 1; overflow: hidden; position: relative; }
+
+.page {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 16px 100px;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  -webkit-overflow-scrolling: touch;
+}
+
+.page.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
+}
+
+/* ── Translate page ── */
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mode-pill {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  border-radius: 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f3f4f6;
+  color: var(--muted);
+}
+
+.mode-pill.active {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  box-shadow: 0 4px 12px rgba(255,107,157,0.3);
+}
+
+.swap-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--pink-light);
+  background: white;
+  color: var(--pink);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.3s;
+}
+
+.swap-btn:active { transform: rotate(180deg); }
+
+.input-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+textarea {
+  width: 100%;
+  border: 2px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  resize: none;
+  outline: none;
+  min-height: 90px;
+  background: #fafafa;
+  color: var(--text);
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+
+textarea:focus { border-color: var(--pink-light); background: white; }
+textarea::placeholder { color: #ccc; }
+
+.translate-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  margin: 12px 0;
+  box-shadow: 0 6px 18px rgba(255,107,157,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.translate-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 3px 10px rgba(255,107,157,0.25);
+}
+
+.translate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Output */
+.output-card {
+  background: linear-gradient(135deg, rgba(255,107,157,0.06), rgba(192,132,252,0.08));
+  border: 2px solid var(--pink-light);
+  border-radius: 16px;
+  padding: 14px;
+  position: relative;
+  min-height: 64px;
+  animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.output-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.6;
+  padding-right: 36px;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.copy-btn:active { transform: scale(0.85); opacity: 1; }
+
+/* Record button */
+.record-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.record-btn {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255,107,157,0.4);
+  transition: transform 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+
+.record-btn.recording {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  animation: recordPulse 1s ease-in-out infinite;
+}
+
+@keyframes recordPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+}
+
+.record-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ── Mood page ── */
+.mood-hero {
+  text-align: center;
+  padding: 20px 0 16px;
+}
+
+.mood-cat-big {
+  font-size: 60px;
+  display: block;
+  margin-bottom: 8px;
+  animation: floatCat 3s ease-in-out infinite;
+}
+
+@keyframes floatCat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.mood-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.mood-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.mood-card-display {
+  border-radius: 24px;
+  padding: 28px 20px;
+  margin-bottom: 14px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.mood-card-display::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+}
+
+.mood-emoji-big { font-size: 52px; }
+.mood-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.mood-quote {
+  font-size: 14px;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.6;
+  max-width: 280px;
+}
+
+.generate-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255,107,157,0.35);
+  margin-bottom: 16px;
+  transition: transform 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.generate-btn:active { transform: scale(0.97); }
+
+/* Mood chips */
+.mood-chips {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mood-chip {
+  background: white;
+  border-radius: 12px;
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+}
+
+.mood-chip:active { transform: scale(0.92); }
+.mood-chip.selected { border-color: var(--pink); }
+.mood-chip .chip-emoji { font-size: 22px; }
+.mood-chip .chip-name { font-size: 9px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+
+/* ── Meow page ── */
+.meow-hero {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.big-meow-btn {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  font-size: 40px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255,107,157,0.45);
+  margin: 16px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: transform 0.15s;
+  position: relative;
+}
+
+.big-meow-btn:active { transform: scale(0.93); }
+
+.big-meow-btn .btn-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+.big-meow-btn.playing {
+  animation: meowBounce 0.4s ease;
+}
+
+@keyframes meowBounce {
+  0%,100% { transform: scale(1); }
+  30% { transform: scale(1.12); }
+  60% { transform: scale(0.95); }
+}
+
+/* Waveform */
+.waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 36px;
+  margin: 4px 0;
+}
+
+.wave-bar {
+  width: 5px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--pink), var(--purple));
+  height: 6px;
+  transition: height 0.15s;
+}
+
+.waveform.active .wave-bar:nth-child(1) { animation: wave 0.6s 0.0s ease-in-out infinite alternate; }
+.waveform.active .wave-bar:nth-child(2) { animation: wave 0.6s 0.1s ease-in-out infinite alternate; }
+.waveform.active .wave-bar:nth-child(3) { animation: wave 0.6s 0.2s ease-in-out infinite alternate; }
+.waveform.active .wave-bar:nth-child(4) { animation: wave 0.6s 0.0s ease-in-out infinite alternate; }
+.waveform.active .wave-bar:nth-child(5) { animation: wave 0.6s 0.15s ease-in-out infinite alternate; }
+.waveform.active .wave-bar:nth-child(6) { animation: wave 0.6s 0.05s ease-in-out infinite alternate; }
+.waveform.active .wave-bar:nth-child(7) { animation: wave 0.6s 0.2s ease-in-out infinite alternate; }
+
+@keyframes wave {
+  from { height: 6px; }
+  to { height: 28px; }
+}
+
+/* Sound grid */
+.sound-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.sound-btn {
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 14px 8px;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+}
+
+.sound-btn:active { transform: scale(0.93); }
+
+.sound-btn.playing {
+  border-color: var(--pink);
+  background: var(--pink-bg);
+}
+
+.sound-btn .s-emoji { font-size: 28px; }
+.sound-btn .s-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 4px;
+  display: block;
+}
+
+/* Meow guide */
+.guide-card {
+  background: white;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.guide-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.guide-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.guide-row:last-child { border-bottom: none; }
+
+.guide-sound {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pink);
+  width: 88px;
+  flex-shrink: 0;
+}
+
+.guide-meaning {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* floating paws decoration */
+.paw-float {
+  position: fixed;
+  font-size: 20px;
+  opacity: 0.06;
+  pointer-events: none;
+  animation: pawFloat var(--dur) ease-in-out infinite var(--delay);
+}
+
+@keyframes pawFloat {
+  0%,100% { transform: translateY(0) rotate(var(--rot)); }
+  50% { transform: translateY(-15px) rotate(calc(var(--rot) + 10deg)); }
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(31,31,46,0.88);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Section heading */
+.sec-heading {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  margin-top: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- Floating paw decorations -->
+<div class="paw-float" style="top:15%;left:5%;--dur:4s;--delay:-1s;--rot:-20deg">🐾</div>
+<div class="paw-float" style="top:60%;right:4%;--dur:5s;--delay:-2.5s;--rot:15deg">🐾</div>
+<div class="paw-float" style="top:35%;right:8%;--dur:3.5s;--delay:-0.5s;--rot:30deg">🐾</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="app">
+  <!-- Top bar -->
+  <div class="topbar">
+    <span class="cat-face">🐱</span>
+    <div class="app-title">猫语翻译器</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(0,this)">
+      <span class="tab-icon">🔤</span>翻译
+    </button>
+    <button class="tab-btn" onclick="switchTab(1,this)">
+      <span class="tab-icon">💭</span>心情
+    </button>
+    <button class="tab-btn" onclick="switchTab(2,this)">
+      <span class="tab-icon">🔊</span>猫叫
+    </button>
+  </div>
+
+  <!-- Pages -->
+  <div class="pages">
+
+    <!-- ── Page 0: Translate ── -->
+    <div class="page active" id="page-0">
+      <div class="card">
+        <!-- Mode toggle -->
+        <div class="mode-row">
+          <button class="mode-pill active" id="mode-h2c" onclick="setMode('h2c')">人话 → 猫语</button>
+          <button class="swap-btn" onclick="swapMode()" title="交换">⇄</button>
+          <button class="mode-pill" id="mode-c2h" onclick="setMode('c2h')">猫语 → 人话</button>
+        </div>
+
+        <!-- Input -->
+        <div class="input-label">
+          <span id="inputIcon">👤</span>
+          <span id="inputLabel">输入人话</span>
+        </div>
+        <textarea id="inputText" rows="3" placeholder="输入你想说的话，本喵来翻译喵～"></textarea>
+
+        <!-- Record button (cat→human mode) -->
+        <div class="record-wrap" id="recordWrap" style="display:none">
+          <button class="record-btn" id="recordBtn" onclick="toggleRecord()">🎤</button>
+          <span class="record-label" id="recordLabel">点击录制猫叫声</span>
+        </div>
+
+        <!-- Translate button -->
+        <button class="translate-btn" onclick="doTranslate()" id="translateBtn">
+          ✨ 翻译喵～
+        </button>
+
+        <!-- Output -->
+        <div id="outputWrap" style="display:none">
+          <div class="input-label">
+            <span id="outputIcon">🐾</span>
+            <span id="outputLabel">猫语结果</span>
+          </div>
+          <div class="output-card">
+            <div class="output-text" id="outputText"></div>
+            <button class="copy-btn" onclick="copyOutput()" title="复制">📋</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Page 1: Mood ── -->
+    <div class="page" id="page-1">
+      <div class="mood-hero">
+        <span class="mood-cat-big" id="moodCatBig">🐱</span>
+        <div class="mood-title">今日猫语录</div>
+        <div class="mood-sub">本喵今天的内心独白</div>
+      </div>
+
+      <!-- Mood card -->
+      <div class="mood-card-display" id="moodCardDisplay" style="background: linear-gradient(135deg,#ff6b9d,#c084fc)">
+        <div class="mood-emoji-big" id="moodEmoji">😺</div>
+        <div class="mood-name" id="moodName">点击生成心情</div>
+        <div class="mood-quote" id="moodQuote">本喵现在是薛定谔的心情，观测前不确定</div>
+      </div>
+
+      <button class="generate-btn" onclick="generateMood()">
+        🎲 随机一条喵语录
+      </button>
+
+      <div class="sec-heading">选择心情</div>
+      <div class="mood-chips" id="moodChips"></div>
+    </div>
+
+    <!-- ── Page 2: Meow ── -->
+    <div class="page" id="page-2">
+      <div class="meow-hero">
+        <div class="mood-title">猫叫播放器</div>
+        <div class="mood-sub">各种心情的喵声</div>
+
+        <button class="big-meow-btn" id="bigMeowBtn" onclick="playBigMeow()">
+          <span id="bigMeowFace">😸</span>
+          <span class="btn-label" id="bigMeowLabel">点我喵叫</span>
+        </button>
+
+        <div class="waveform" id="waveform">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+      </div>
+
+      <div class="sec-heading">选择心情猫叫</div>
+      <div class="sound-grid" id="soundGrid"></div>
+
+      <div class="guide-card">
+        <div class="guide-title">🎓 喵语指南</div>
+        <div class="guide-row"><span class="guide-sound">短促「喵」</span><span class="guide-meaning">打招呼 / 想要东西</span></div>
+        <div class="guide-row"><span class="guide-sound">拖长「喵～」</span><span class="guide-meaning">撒娇 / 求摸摸</span></div>
+        <div class="guide-row"><span class="guide-sound">连续「喵喵喵」</span><span class="guide-meaning">急切 / 饿了！</span></div>
+        <div class="guide-row"><span class="guide-sound">低沉「嗷呜」</span><span class="guide-meaning">不高兴 / 警告</span></div>
+        <div class="guide-row"><span class="guide-sound">小声「咕噜」</span><span class="guide-meaning">满足 / 开心</span></div>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+</div><!-- /app -->
+
+<script>
+// ── 数据 ──────────────────────────────────────────────────────────
+const MOODS = [
+  { emoji:'😸', name:'心情大好',  quote:'今天阳光正好，本喵决定把肚皮献给暖光。',       grad:['#FFD700','#FFA500'] },
+  { emoji:'😾', name:'微微不爽',  quote:'你动了我的猫窝。我记住了。',                   grad:['#FF6B6B','#EE5A24'] },
+  { emoji:'😺', name:'想要撸撸',  quote:'嗯......其实你现在摸我的话，本喵不会拒绝的。', grad:['#FF9F7E','#FF6B9D'] },
+  { emoji:'🙀', name:'大受震撼',  quote:'刚才窗外有只鸽子！！！！！！',                 grad:['#A78BFA','#7C3AED'] },
+  { emoji:'😴', name:'困得要死',  quote:'昨晚巡逻了一整晚，现在要睡十六个小时。勿扰。', grad:['#60A5FA','#3B82F6'] },
+  { emoji:'😹', name:'暗中得意',  quote:'你找了半小时的发圈，在我这里，哈。',           grad:['#34D399','#059669'] },
+  { emoji:'🐱', name:'哲学沉思',  quote:'窗外的雨，猫碗里的水，本质上都是水。',         grad:['#94A3B8','#64748B'] },
+  { emoji:'😿', name:'轻微委屈',  quote:'你出门的时候没和我说再见。',                   grad:['#F472B6','#EC4899'] },
+  { emoji:'😼', name:'霸道总裁',  quote:'这个家，从沙发到阳台，都是本喵的领地。',       grad:['#FB923C','#F97316'] },
+  { emoji:'🐈', name:'若无其事',  quote:'那个花瓶？不知道，是自己掉的。',               grad:['#4ADE80','#22C55E'] },
+];
+
+const SOUNDS = [
+  { emoji:'😺', name:'开心喵',   text:'喵～喵喵～' },
+  { emoji:'😾', name:'不爽喵',   text:'嗷呜！！' },
+  { emoji:'😸', name:'撒娇喵',   text:'喵喵喵喵～' },
+  { emoji:'🙀', name:'受惊喵',   text:'喵！！！' },
+  { emoji:'😴', name:'懒洋洋',   text:'...喵...' },
+  { emoji:'😹', name:'大笑喵',   text:'喵哈哈哈' },
+];
+
+// ── 翻译引擎 ──────────────────────────────────────────────────────
+const SHORT_P  = ['嗯。','我在。','知道了。','叫我干嘛？','别烦我。','我困了。','有吃的吗？'];
+const NORMAL_P = ['你今天还不错，摸头杀一下。','本喵想要罐头，快去买。','太阳很好，我要去晒肚子了。','你什么时候回来？我想你了（但不会说出口）。','帮我挠一下下巴，本喵赏你。','我刚才在做梦，梦里有无限猫粮。'];
+const LONG_P   = ['呼噜呼噜～本喵心情大好，今天可以多摸五秒。','这个位置是我的，你坐哪里都行，除了这里。','我其实很想你，但作为一只猫，不能表现得太明显。','刚才窗外有只鸟，好烦，差点没忍住。'];
+const REPEAT_P = ['快点快点！罐头时间到了！','我说了很多遍了，这个玩具不好玩！','有人在吗？！我的碗空了！！','再不理我我就把杯子推下去！！'];
+const ANGRY_P  = ['你碰了我的尾巴！！','本喵不高兴，后果自负。','再靠近一步试试？！','你刚才踩到我了，不能原谅。'];
+const STORY_P  = ['今天我去巡视了一遍领地，发现沙发角有个奇怪的味道，调查了两个小时，原来是你新买的洗衣液。不喜欢。','我认真考虑过了，决定原谅你昨天忘了给我开空调这件事。但只有这一次。','我刚才打了个盹，梦到自己是草原上最厉害的猎手。醒来发现是只家猫。有点失落，但罐头还是要吃的。'];
+
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function humanToCat(text) {
+  if (!text.trim()) return '';
+  const words = text.split(/\s+/).filter(Boolean);
+  const result = words.map((w, i) => {
+    const len = Math.max(1, w.length);
+    const bases = ['喵', 'miao', '喵~', 'Miao'];
+    const angryW = ['不','讨厌','烦','生气','滚','坏'];
+    const happyW = ['爱','好','喜','开心','快乐','棒','赞'];
+    const isAngry = angryW.some(x => w.includes(x));
+    const isHappy = happyW.some(x => w.includes(x));
+    if (isAngry) return '嗷' + '呜'.repeat(Math.min(len, 2));
+    if (isHappy) return '喵' + '！'.repeat(Math.min(len, 2));
+    if (len <= 2) return '喵';
+    if (len <= 4) return '喵喵';
+    return bases[i % bases.length];
+  });
+  let out = result.join(' ');
+  if (text.match(/[？?]/)) out += '？喵~';
+  else if (text.match(/[！!]/)) out += '！！！';
+  else out += '~';
+  return out;
+}
+
+function catToHuman(text) {
+  const lower = text.toLowerCase();
+  const len = text.length;
+  const hasRepeat = /喵{3,}|miao.*miao/i.test(text);
+  const hasLong = /[～~]/.test(text);
+  const isAngry = /[！!]{2,}|嗷/.test(text);
+  if (isAngry) return rand(ANGRY_P);
+  if (len <= 4 && !hasRepeat) return rand(SHORT_P);
+  if (hasLong) return rand(LONG_P);
+  if (hasRepeat) return rand(REPEAT_P);
+  if (len > 15) return rand(STORY_P);
+  return rand(NORMAL_P);
+}
+
+// ── 状态 ──────────────────────────────────────────────────────────
+let mode = 'h2c'; // h2c | c2h
+let currentMoodIdx = 0;
+let isRecording = false;
+let speechRecognition = null;
+let playingSound = -1;
+let synth = window.speechSynthesis;
+
+// ── Tab 切换 ──────────────────────────────────────────────────────
+function switchTab(idx, btn) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.page').forEach((p,i) => {
+    p.classList.toggle('active', i === idx);
+  });
+}
+
+// ── 翻译模式 ──────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-h2c').classList.toggle('active', m === 'h2c');
+  document.getElementById('mode-c2h').classList.toggle('active', m === 'c2h');
+  document.getElementById('inputIcon').textContent  = m === 'h2c' ? '👤' : '🐱';
+  document.getElementById('inputLabel').textContent = m === 'h2c' ? '输入人话' : '输入猫语（或录音）';
+  document.getElementById('outputIcon').textContent  = m === 'h2c' ? '🐾' : '👤';
+  document.getElementById('outputLabel').textContent = m === 'h2c' ? '猫语结果' : '人话翻译';
+  const input = document.getElementById('inputText');
+  input.placeholder = m === 'h2c' ? '输入你想说的话，本喵来翻译喵～' : '输入喵喵喵，或点击录音按钮...';
+  document.getElementById('recordWrap').style.display = m === 'c2h' ? 'flex' : 'none';
+  document.getElementById('outputWrap').style.display = 'none';
+}
+
+function swapMode() {
+  const newMode = mode === 'h2c' ? 'c2h' : 'h2c';
+  const curOut = document.getElementById('outputText').textContent;
+  const curIn  = document.getElementById('inputText').value;
+  setMode(newMode);
+  document.getElementById('inputText').value = curOut;
+  if (curOut) doTranslate();
+}
+
+function doTranslate() {
+  const text = document.getElementById('inputText').value.trim();
+  if (!text) return;
+  const result = mode === 'h2c' ? humanToCat(text) : catToHuman(text);
+  document.getElementById('outputText').textContent = result;
+  const wrap = document.getElementById('outputWrap');
+  wrap.style.display = 'block';
+  // re-trigger animation
+  const card = wrap.querySelector('.output-card');
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = ''; });
+}
+
+function copyOutput() {
+  const text = document.getElementById('outputText').textContent;
+  if (!text) return;
+  navigator.clipboard?.writeText(text).then(() => showToast('已复制喵～ 📋'));
+}
+
+// ── 录音 ──────────────────────────────────────────────────────────
+function toggleRecord() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    showToast('该浏览器不支持语音识别喵 😿');
+    return;
+  }
+  if (isRecording) {
+    stopRecord();
+  } else {
+    startRecord();
+  }
+}
+
+function startRecord() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  speechRecognition = new SR();
+  speechRecognition.lang = 'zh-CN';
+  speechRecognition.continuous = false;
+  speechRecognition.interimResults = true;
+
+  speechRecognition.onresult = (e) => {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('inputText').value = transcript;
+    if (e.results[e.results.length-1].isFinal) {
+      doTranslate();
+      stopRecord();
+    }
+  };
+
+  speechRecognition.onerror = () => {
+    showToast('录音出错了喵 😿');
+    stopRecord();
+  };
+
+  speechRecognition.onend = () => stopRecord();
+
+  speechRecognition.start();
+  isRecording = true;
+  document.getElementById('recordBtn').classList.add('recording');
+  document.getElementById('recordBtn').textContent = '⏹';
+  document.getElementById('recordLabel').textContent = '录音中...再按停止';
+}
+
+function stopRecord() {
+  speechRecognition?.stop();
+  isRecording = false;
+  document.getElementById('recordBtn').classList.remove('recording');
+  document.getElementById('recordBtn').textContent = '🎤';
+  document.getElementById('recordLabel').textContent = '点击录制猫叫声';
+}
+
+// ── 心情 ──────────────────────────────────────────────────────────
+function renderMoodChips() {
+  const container = document.getElementById('moodChips');
+  container.innerHTML = MOODS.map((m, i) => `
+    <div class="mood-chip ${i === 0 ? 'selected' : ''}" onclick="selectMood(${i})" id="chip-${i}">
+      <div class="chip-emoji">${m.emoji}</div>
+      <div class="chip-name">${m.name}</div>
+    </div>
+  `).join('');
+}
+
+function selectMood(idx) {
+  currentMoodIdx = idx;
+  const mood = MOODS[idx];
+  document.querySelectorAll('.mood-chip').forEach((c, i) => c.classList.toggle('selected', i === idx));
+  updateMoodCard(mood);
+}
+
+function updateMoodCard(mood) {
+  document.getElementById('moodEmoji').textContent = mood.emoji;
+  document.getElementById('moodName').textContent = mood.name;
+  document.getElementById('moodQuote').textContent = mood.quote;
+  document.getElementById('moodCatBig').textContent = mood.emoji;
+  const card = document.getElementById('moodCardDisplay');
+  card.style.background = `linear-gradient(135deg, ${mood.grad[0]}, ${mood.grad[1]})`;
+  // bounce
+  card.style.transform = 'scale(0.95)';
+  setTimeout(() => card.style.transform = '', 300);
+}
+
+function generateMood() {
+  const idx = Math.floor(Math.random() * MOODS.length);
+  selectMood(idx);
+  // update chip scroll
+  document.getElementById('chip-' + idx)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── 猫叫 ──────────────────────────────────────────────────────────
+function renderSoundGrid() {
+  const container = document.getElementById('soundGrid');
+  container.innerHTML = SOUNDS.map((s, i) => `
+    <button class="sound-btn" id="sound-${i}" onclick="playSound(${i})">
+      <div class="s-emoji">${s.emoji}</div>
+      <span class="s-name">${s.name}</span>
+    </button>
+  `).join('');
+}
+
+function speakText(text, pitch = 1.8, rate = 0.4) {
+  if (!synth) return;
+  synth.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'zh-CN';
+  utter.pitch = pitch;
+  utter.rate = rate;
+  utter.volume = 1;
+  synth.speak(utter);
+  return utter;
+}
+
+function playBigMeow() {
+  const btn = document.getElementById('bigMeowBtn');
+  const face = document.getElementById('bigMeowFace');
+  const label = document.getElementById('bigMeowLabel');
+  const waveform = document.getElementById('waveform');
+
+  btn.classList.add('playing');
+  face.textContent = '（>ω<）';
+  label.textContent = '喵喵喵～';
+  waveform.classList.add('active');
+
+  speakText('喵～喵喵～喵喵喵');
+
+  setTimeout(() => {
+    btn.classList.remove('playing');
+    face.textContent = '😸';
+    label.textContent = '点我喵叫';
+    waveform.classList.remove('active');
+  }, 2000);
+}
+
+function playSound(idx) {
+  // Clear previous
+  document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('playing'));
+  document.getElementById('sound-' + idx).classList.add('playing');
+  playingSound = idx;
+
+  const s = SOUNDS[idx];
+  const isAngry = idx === 1 || idx === 3;
+  const isSleepy = idx === 4;
+  speakText(s.text, isAngry ? 1.2 : isSleepy ? 2.2 : 2.0, isAngry ? 0.3 : isSleepy ? 0.25 : 0.4);
+
+  // Also animate big button
+  const bigBtn = document.getElementById('bigMeowBtn');
+  const bigFace = document.getElementById('bigMeowFace');
+  const waveform = document.getElementById('waveform');
+  bigBtn.classList.add('playing');
+  bigFace.textContent = s.emoji;
+  waveform.classList.add('active');
+
+  setTimeout(() => {
+    document.getElementById('sound-' + idx)?.classList.remove('playing');
+    bigBtn.classList.remove('playing');
+    bigFace.textContent = '😸';
+    waveform.classList.remove('active');
+    playingSound = -1;
+  }, 1800);
+}
+
+// ── Toast ──────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── Enter 键翻译 ──────────────────────────────────────────────────
+document.getElementById('inputText').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    doTranslate();
+  }
+});
+
+// ── Init ──────────────────────────────────────────────────────────
+renderMoodChips();
+renderSoundGrid();
+updateMoodCard(MOODS[0]);
+</script>
+</body>
+</html>
